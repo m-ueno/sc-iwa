@@ -3,17 +3,37 @@ program cg
   integer,parameter :: max_iter = 10000
   double precision,parameter :: epsilon = 1e-7
 
-  integer :: i, iold=0, j, k, iter, n, nzero, debug
-  integer :: row_ptr_index=1
+  integer :: i, iold=0, j, k, iter, n, nn, nzero, debug
+  integer :: row_ptr_index=1, argc
   integer,allocatable,dimension(:) :: row_ptr, col_idx
   double precision :: val, r_norm, b_norm, roh, roh_old, alpha, beta
   double precision,allocatable,dimension(:) :: a, b, p, q, r, x
+  character(50) :: s
 
-  debug = iargc()
+  argc = iargc()
+  print *, "argc", argc
+  if ( argc > 1 ) then
+     debug = 1
+  end if
+
+  if ( argc > 0 ) then
+     call getarg(1, s)
+     read (s,*) n
+  end if
+
+  print *, n**2
+
+  ! make file name str
+  write(s, '("poisson.matrix.",I0,".data")') n
+  print *, "s=", s
 
   ! initialize n, nzero
-  open (10,file='poisson.matrix.900.data')
-  read(10,*) n,nzero                !900, 3924
+  open (10,file=s)
+  read(10,*) nn,nzero                !900, 3924
+
+  if ( n .ne. nn ) then
+     return
+  endif
 
   allocate(a(nzero))
   allocate(col_idx(nzero))
@@ -43,7 +63,9 @@ program cg
   ! trick
   row_ptr(row_ptr_index) = nzero+1
 
-  open (20,file='poisson.rhs.900.data.mod')
+  write(s, '("poisson.rhs.",I0,".data.mod")') n
+
+  open (20,file=s)
   do i = 1,n
      read(20,*) val
      b(i) = val
