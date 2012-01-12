@@ -45,13 +45,15 @@ program jacobi1
         print *, "res", res        !debug
      end if
 
-     if( res < epsilon ) then
-        exit ! break do
-     end if
+     ! 
+     
+     ! if( res < epsilon ) then
+     !    exit ! break do
+     ! end if
 
      xold = x
 
-  end do
+  end do ! k-loop
 
   !! print
   do i=1,n
