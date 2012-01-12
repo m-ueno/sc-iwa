@@ -3,17 +3,18 @@ program cg
   integer,parameter :: max_iter = 10000
   double precision,parameter :: epsilon = 1e-7
 
-  integer :: i, iold=0, j, k, iter, n, nn, nzero, debug
+  integer :: i, iold=0, j, k, iter, n, nn, nzero
   integer :: row_ptr_index=1, argc
   integer,allocatable,dimension(:) :: row_ptr, col_idx
   double precision :: val, r_norm, b_norm, roh, roh_old, alpha, beta
   double precision,allocatable,dimension(:) :: a, b, p, q, r, x
   character(50) :: s
+  logical :: debug
 
   argc = iargc()
   print *, "argc", argc
   if ( argc > 1 ) then
-     debug = 1
+     debug = .true.
   end if
 
   if ( argc > 0 ) then
@@ -21,11 +22,11 @@ program cg
      read (s,*) n
   end if
 
-  print *, n**2
-
   ! make file name str
   write(s, '("poisson.matrix.",I0,".data")') n
-  print *, "s=", s
+  if (debug) then
+     print *, "s=", s
+  end if
 
   ! initialize n, nzero
   open (10,file=s)
@@ -123,7 +124,7 @@ program cg
   end do ! iter
 
   !! print
-  if (debug > 0) then
+  if (debug) then
      do i=1,n
         if (x(i) > 0.01) then
            print *, i, x(i)
