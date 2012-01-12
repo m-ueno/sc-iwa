@@ -1,18 +1,25 @@
 program jacobi2
   implicit none
   integer,parameter :: n = 900, max_iter = 100000, nzero=3924
-  integer :: i,iold=0,j,k
   double precision,parameter :: epsilon = 1e-7
-  integer :: col_ind(nzero), row_ptr(n), row_ptr_index=1, jj
-  double precision :: a(nzero),b(n),x(n),xold(n),res,l,val
 
-  !! CSR
+  integer :: i,iold=0, j, k, jj, iter
+  integer :: col_idx(nzero), row_ptr(n+1), row_ptr_index=1
+  double precision :: res,val
+  double precision :: a(nzero),b(n),x(n),xold(n), r(n), d(n)
+
+  !! CRS
   open (10,file='poisson.matrix.900.data')
-  read(10,*) i             !900, 3924
+  read(10,*) i,i                !900, 3924
   do k=1,nzero
      read(10,*) i,j,val
      a(k) = val
-     col_ind = j
+     col_idx(k) = j
+
+     if ( i == j ) then
+        d(i) = val
+     end if
+
      if (i>iold) then
         iold = i
         row_ptr(row_ptr_index) = k
