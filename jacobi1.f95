@@ -3,7 +3,8 @@ program jacobi1
   integer,parameter :: n = 900, max_iter = 100000
   integer :: i,j,k,nn,nzero
   double precision,parameter :: epsilon = 1e-7
-  double precision :: a(n,n),b(n),x(n),xold(n),val,res
+  double precision :: val, res
+  double precision :: a(n,n),b(n),x(n),xold(n),r(n)
 
   a = 0d0
   open (10,file='poisson.matrix.900.data')
@@ -17,39 +18,48 @@ program jacobi1
   do i = 1,n
      read(20,*) val
      b(i) = val
-     !   print *, val !! debug
+!     print *, "b(i)",val !! debug
      xold(i) = 0d0
   enddo
 
   !! start main loop
   do k=1, max_iter
 
-     res = 0d0                  ! residual
-
      do i=1,n
 
         x(i) = b(i)
 
-        do j=1,n
-           if ( i .ne. j ) then
-              x(i) = x(i) - a(j,i)*xold(j)
-           end if
+        do j=1,i-1
+           x(i) = x(i) - a(j,i)*xold(j)
         end do
 
+        do j=i+1,n
+           x(i) = x(i) - a(j,i)*xold(j)
+        enddo
+
         x(i) = x(i) / a(i,i)
-        res = res + abs( x(i) - xold(i) )
 
      end do
 
-     if ( mod(k,100) == 1 ) then
-        print *, "res", res        !debug
-     end if
+     !! 残差評価
+     ! 残差ベクトル r(i) = -Ax + b ( = b - Ax )
+     do i=1,n
+        r(i) = b(i)
+        do j=1,n
+           r(i) = r(i) - a(j,i)*x(j)
+        end do
+     end do
 
-     ! 
-     
-     ! if( res < epsilon ) then
-     !    exit ! break do
-     ! end if
+     ! 相対残差ノルム
+     res = sqrt(dot_product(r,r)) / sqrt(dot_product(b,b))
+
+     if ( mod(k,100) == 1 ) then
+        print *, "k=",k, "res=", res
+     end if
+    
+     if( res < epsilon ) then
+        exit ! break do
+     end if
 
      xold = x
 
