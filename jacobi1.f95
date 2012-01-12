@@ -1,10 +1,12 @@
 program jacobi1
   implicit none
   integer,parameter :: n = 900, max_iter = 100000
-  integer :: i,j,k,nn,nzero
+  integer :: i,j,k,nn,nzero,debug=0
   double precision,parameter :: epsilon = 1e-7
-  double precision :: val, res
+  double precision :: val, res, r_norm, b_norm
   double precision :: a(n,n),b(n),x(n),xold(n),r(n)
+
+  debug = iargc()
 
   a = 0d0
   open (10,file='poisson.matrix.900.data')
@@ -21,6 +23,8 @@ program jacobi1
 !     print *, "b(i)",val !! debug
      xold(i) = 0d0
   enddo
+
+  b_norm = sqrt(dot_product(b,b))
 
   !! start main loop
   do k=1, max_iter
@@ -51,26 +55,28 @@ program jacobi1
      end do
 
      ! 相対残差ノルム
-     res = sqrt(dot_product(r,r)) / sqrt(dot_product(b,b))
+     r_norm = sqrt(dot_product(r,r))
 
      if ( mod(k,100) == 1 ) then
-        print *, "k=",k, "res=", res
+        print *, "k=",k, "r=", r_norm
      end if
     
-     if( res < epsilon ) then
+     if( r_norm < epsilon*b_norm ) then
         exit ! break do
      end if
 
      xold = x
 
   end do ! k-loop
-
+  
   !! print
-  do i=1,n
-     if (x(i) > 0.01) then
-        print *, i, x(i)
-     end if
-  end do
+  if (debug>0) then
+     do i=1,n
+        if (x(i) > 0.01) then
+           print *, i, x(i)
+        end if
+     end do
+  end if
   
   print *, "k=",k
 

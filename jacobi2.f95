@@ -3,11 +3,14 @@ program jacobi2
   integer,parameter :: max_iter = 100000
   double precision,parameter :: epsilon = 1e-7
 
-  integer :: i,iold=0, j, k, iter, n, nzero
+  integer :: i,iold=0, j, k, iter, n, nzero, debug
   integer :: row_ptr_index=1
   integer,allocatable,dimension(:) :: row_ptr, col_idx
   double precision :: res, val, r_norm, b_norm
   double precision,allocatable,dimension(:) :: a, b, x, xold, r, diag
+
+  debug = iargc()
+
 
   ! initialize n, nzero
   open (10,file='poisson.matrix.900.data')
@@ -97,13 +100,15 @@ program jacobi2
      xold = x
 
   end do ! iter
-
+  
   !! print
-  do i=1,n
-     if (x(i) > 0.01) then
-        print *, i, x(i)
-     end if
-  end do
+  if ( debug>0 ) then
+     do i=1,n
+        if (x(i) > 0.01) then
+           print *, i, x(i)
+        end if
+     end do
+  end if
   
   print *, "iter=",iter
 

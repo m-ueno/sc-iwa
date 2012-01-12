@@ -1,15 +1,18 @@
-program cg
+program gauss_seidel2
   implicit none
-  integer,parameter :: max_iter = 10000
+  integer,parameter :: max_iter = 100000
   double precision,parameter :: epsilon = 1e-7
 
-  integer :: i, iold=0, j, k, iter, n, nzero, debug
+  integer :: i,iold=0, j, k, iter, n, nzero, debug
   integer :: row_ptr_index=1
   integer,allocatable,dimension(:) :: row_ptr, col_idx
-  double precision :: val, r_norm, b_norm, roh, roh_old, alpha, beta
-  double precision,allocatable,dimension(:) :: a, b, p, q, r, x
+  double precision :: res, val, r_norm, b_norm
+  double precision,allocatable,dimension(:) :: a, b, x, xold, r, diag
+  character(20) :: s
 
   debug = iargc()
+  write(s,*) debug
+  print *, "debug"//s//"hage"
 
   ! initialize n, nzero
   open (10,file='poisson.matrix.900.data')
@@ -20,18 +23,22 @@ program cg
 
   allocate(row_ptr(n+1))
   allocate(b(n))
-  allocate(p(n))
-  allocate(q(n))
-  allocate(r(n))
   allocate(x(n))
+  allocate(xold(n))
+  allocate(r(n))
+  allocate(diag(n))
 
-  x = 0d0
+  xold = 0d0
 
   !! CRS
   do k=1,nzero
      read(10,*) i,j,val
      a(k) = val
      col_idx(k) = j
+
+     if ( i == j ) then
+        diag(i) = val
+     end if
 
      if (i>iold) then
         iold = i
@@ -52,56 +59,54 @@ program cg
 
   b_norm = sqrt(dot_product(b,b))
 
-  ! cg
-  do i=1,n
-     r(i) = b(i)
-     do k = row_ptr(i), row_ptr(i+1)-1
-        j = col_idx(k)
-        r(i) = r(i) - a(k) * x(j)
-     end do
-  end do
-
-  !! ================================================================
+  !! start main loop
   do iter=1, max_iter
-     roh = dot_product(r,r)
 
-     if( iter==1 ) then
-        p = r
-     else
-        beta = roh/roh_old
-        p = r + beta*p
-     end if
-
-     q = 0d0 ! vector
      do i=1,n
+
+        x(i) = b(i)
+
+        ! k : 非ゼロ要素のval中の序列
         do k = row_ptr(i), row_ptr(i+1)-1
            j = col_idx(k)
-           q(i) = q(i) + a(k) * p(j)
+           if ( j < i ) then
+              x(i) = x(i) - a(k)*x(j)
+           else if ( j > i ) then
+              x(i) = x(i) - a(k)*xold(j)
+           end if
         end do
+        
+        x(i) = x(i) / diag(i)
+
      end do
-
-     alpha = roh / dot_product(p,q)     
-     x = x + alpha*p
-     r = r - alpha*q
-
-     roh_old = roh
 
      !! 残差評価
      ! 残差ベクトル r = b - Ax
+     do i=1,n
+        r(i) = b(i)
+
+        do k = row_ptr(i), row_ptr(i+1)-1
+           j = col_idx(k)
+           r(i) = r(i) - a(k) * x(j)
+        enddo
+     end do
+
      r_norm = sqrt(dot_product(r,r))
 
-!     if ( mod(iter,100) == 1 ) then
-        print *, "iter=",iter, "r=", r_norm
-!     end if
+     if ( mod(iter,100) == 1 ) then
+        print *, "iter=",iter, "r", r_norm
+     end if
 
      if( r_norm < epsilon*b_norm ) then
         exit ! break do
      end if
 
+     xold = x
+
   end do ! iter
 
   !! print
-  if (debug > 0) then
+  if ( debug>0 ) then
      do i=1,n
         if (x(i) > 0.01) then
            print *, i, x(i)
@@ -111,5 +116,5 @@ program cg
 
   print *, "iter=",iter
 
-end program cg
+end program gauss_seidel2
 
