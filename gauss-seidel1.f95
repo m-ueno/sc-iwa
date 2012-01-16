@@ -61,10 +61,10 @@ program gauss_seidel1
      ! 相対残差ノルム
      r_norm = sqrt(dot_product(r,r))
 
-     if ( mod(k,100) == 1 ) then
-        print *, "k=",k, "r=", r_norm
-     end if
-    
+!     if ( mod(k,100) == 1 ) then
+!        print *, "k=",k, "r=", r_norm
+!     end if
+
      if( r_norm < epsilon*b_norm ) then
         exit ! break do
      end if
@@ -72,6 +72,8 @@ program gauss_seidel1
      xold = x
 
   end do ! k-loop
+
+  call cpu_time( t2 )
 
   !! print
   if (debug>0) then
