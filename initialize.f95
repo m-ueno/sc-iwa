@@ -1,7 +1,8 @@
   integer, external :: iargc
 
   argc = iargc()
-  print *, "argc:", argc
+
+  debug = .false.
 
   if ( argc > 1 ) then
      debug = .true.
