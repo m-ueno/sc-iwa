@@ -1,3 +1,5 @@
+  integer, external :: iargc
+
   argc = iargc()
 
   if ( argc > 1 ) then
