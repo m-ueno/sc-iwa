@@ -3,59 +3,19 @@ program jacobi2
   integer,parameter :: max_iter = 100000
   double precision,parameter :: epsilon = 1e-7
 
-  integer :: i,iold=0, j, k, iter, n, nzero, debug
+  integer :: i,iold=0, j, k, iter, n, nn, nzero, argc
   integer :: row_ptr_index=1
   integer,allocatable,dimension(:) :: row_ptr, col_idx
   double precision :: res, val, r_norm, b_norm
   double precision,allocatable,dimension(:) :: a, b, x, xold, r, diag
+  character(50) :: s
+  logical :: debug
+  real :: t1, t2
 
-  debug = iargc()
+  include "initialize.f95"
 
-
-  ! initialize n, nzero
-  open (10,file='poisson.matrix.900.data')
-  read(10,*) n,nzero                !900, 3924
-
-  allocate(a(nzero))
-  allocate(col_idx(nzero))
-
-  allocate(row_ptr(n+1))
-  allocate(b(n))
-  allocate(x(n))
   allocate(xold(n))
-  allocate(r(n))
-  allocate(diag(n))
-
   xold = 0d0
-
-  !! CRS
-  do k=1,nzero
-     read(10,*) i,j,val
-     a(k) = val
-     col_idx(k) = j
-
-     if ( i == j ) then
-        diag(i) = val
-     end if
-
-     if (i>iold) then
-        iold = i
-        row_ptr(row_ptr_index) = k
-        row_ptr_index = row_ptr_index + 1
-     endif
-  enddo
-
-  ! trick
-  row_ptr(row_ptr_index) = nzero+1
-
-  open (20,file='poisson.rhs.900.data.mod')
-  do i = 1,n
-     read(20,*) val
-     b(i) = val
-     !   print *, val !! debug
-  enddo
-
-  b_norm = sqrt(dot_product(b,b))
 
   !! start main loop
   do iter=1, max_iter
@@ -89,7 +49,7 @@ program jacobi2
 
      r_norm = sqrt(dot_product(r,r))
 
-     if ( mod(iter,100) == 1 ) then
+     if ( debug .and. mod(iter,100) == 1 ) then
         print *, "iter=",iter, "r", r_norm
      end if
 
@@ -101,15 +61,6 @@ program jacobi2
 
   end do ! iter
   
-  !! print
-  if ( debug>0 ) then
-     do i=1,n
-        if (x(i) > 0.01) then
-           print *, i, x(i)
-        end if
-     end do
-  end if
-  
-  print *, "iter=",iter
+  include "finalize.f95"
 
 end program jacobi2
