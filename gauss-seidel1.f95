@@ -5,8 +5,10 @@ program gauss_seidel1
   double precision,parameter :: epsilon = 1e-7
   double precision :: val, res, r_norm, b_norm
   double precision :: a(n,n),b(n),x(n),xold(n),r(n)
+  real :: t1,t2
 
-  debug = iargc()
+!  debug = iargc()
+  debug = 0
 
   a = 0d0
   open (10,file='poisson.matrix.900.data')
@@ -25,6 +27,8 @@ program gauss_seidel1
   enddo
 
   b_norm = sqrt(dot_product(b,b))
+
+  call cpu_time( t1 )
 
   !! start main loop
   do k=1, max_iter
@@ -78,6 +82,7 @@ program gauss_seidel1
      end do
   end if
 
-  print *, "k=",k
+  print *, "k:", k
+  print *, "cpu_time:", t2-t1
 
 end program gauss_seidel1

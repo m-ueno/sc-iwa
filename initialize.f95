@@ -1,13 +1,13 @@
-  integer, external :: iargc
+  ! integer, external :: iargc
 
-  argc = iargc()
+  ! argc = iargc()
 
   debug = .false.
 
-  if ( argc > 1 ) then
-     debug = .true.
-     print *, "argc=", argc
-  end if
+  ! if ( argc > 1 ) then
+  !    debug = .true.
+  !    print *, "argc=", argc
+  ! end if
 
   if ( argc > 0 ) then
      call getarg(1, s)
