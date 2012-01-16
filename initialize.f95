@@ -25,7 +25,7 @@
   read(10,*) nn,nzero                !900, 3924
 
   if ( n .ne. nn ) then
-     return
+     exit
   endif
 
   allocate(a(nzero))
