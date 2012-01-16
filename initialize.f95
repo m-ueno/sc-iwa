@@ -1,6 +1,7 @@
   integer, external :: iargc
 
   argc = iargc()
+  print *, "argc:", argc
 
   if ( argc > 1 ) then
      debug = .true.
@@ -25,7 +26,7 @@
   read(10,*) nn,nzero                !900, 3924
 
   if ( n .ne. nn ) then
-     exit
+     stop
   endif
 
   allocate(a(nzero))
