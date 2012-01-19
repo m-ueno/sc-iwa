@@ -1,4 +1,4 @@
-!  integer, external :: iargc
+  integer, external :: iargc
 
   argc = iargc()
 
