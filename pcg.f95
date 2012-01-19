@@ -25,14 +25,8 @@ program pcg
 
   x = 0d0
 
-  ! pre
   do i=1,n
      diag_inv(i) = 1/diag(i)
-  end do
-
-  a_mod(k) = 0d0
-
-  do i=1,n
      val = 0d0                  ! i行の総和
      do k = row_ptr(i), row_ptr(i+1)-1
 !        j = col_idx(k)
@@ -40,14 +34,15 @@ program pcg
      end do
      a_mod(i) = diag_inv(i) * val
      b_mod(i) = diag_inv(i) * b(i)
+     r(i) = b_mod(i) - a_mod(i) * x(i)
   end do
 
   ! こっから先は col_idx, row_ptr不要
 
   ! cg
-  do i=1,n
-     r(i) = b_mod(i) - a_mod(i) * x(i)
-  end do
+  ! do i=1,n
+  !    r(i) = b_mod(i) - a_mod(i) * x(i)
+  ! end do
 
   do iter=1, max_iter
      roh = dot_product(r,r)
