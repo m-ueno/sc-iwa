@@ -36,7 +36,7 @@ program pcg
      b_mod(i) = diag_inv(i) * b(i)
      r(i) = b_mod(i) - a_mod(i) * x(i)
      if (debug) then
-        print *, "(i, a~, diag, r) = ", i, a_mod(i), diag(i), b_mod(i)
+        print *, "(i, a, a~, diag, diag_inv) = ", i, a(i), a_mod(i), diag(i), diag_inv(i)
      end if
   end do
 
