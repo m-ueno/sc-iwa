@@ -1,6 +1,6 @@
 CC = frt
 CFLAGS = -Kfast
-SRC = jacobi1.out gauss-seidel1.out jacobi2.out gauss-seidel2.out cg.out
+SRC = jacobi1.out gauss-seidel1.out jacobi2.out gauss-seidel2.out cg.out pcg.out
 
 .SUFFIXES: .f95 .out
 .f95.out:
