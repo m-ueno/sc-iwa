@@ -35,6 +35,9 @@ program pcg
      a_mod(i) = diag_inv(i) * val
      b_mod(i) = diag_inv(i) * b(i)
      r(i) = b_mod(i) - a_mod(i) * x(i)
+     if (debug) then
+        print *, "(a~, b~, r) = ", a_mod(i), b_mod(i), r(i)
+     end if
   end do
 
   ! こっから先は col_idx, row_ptr不要
