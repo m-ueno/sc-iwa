@@ -18,8 +18,7 @@ program pcg
   allocate(q(n))
 
   ! Ax = b => A'x = b' (A' = D-1 A, b' = D-1 b)
-  ! a(nzero), a_mod(n)に注意
-  allocate(a_mod(n))
+  allocate(a_mod(nzero))
   allocate(b_mod(n))
   allocate(diag_inv(n))
 
@@ -27,17 +26,18 @@ program pcg
 
   do i=1,n
      diag_inv(i) = 1/diag(i)
-     val = 0d0                  ! i行の総和
+
      do k = row_ptr(i), row_ptr(i+1)-1
-!        j = col_idx(k)
-        val = val + a(k)
+        ! j = col_idx(k)
+        a_mod(k) = diag_inv(i) * a(k)
      end do
-     a_mod(i) = diag_inv(i) * val
+
      b_mod(i) = diag_inv(i) * b(i)
      r(i) = b_mod(i) - a_mod(i) * x(i)
-     if (debug) then
-        print *, "(i, a, a~, diag, diag_inv) = ", i, a(i), a_mod(i), diag(i), diag_inv(i)
-     end if
+
+     ! if (debug) then
+     !    print *, "(i, a, a~, diag, diag_inv) = ", i, a(i), a_mod(i), diag(i), diag_inv(i)
+     ! end if
   end do
 
   ! こっから先は col_idx, row_ptr不要
@@ -57,13 +57,12 @@ program pcg
         p = r + beta*p
      end if
 
-     q = 0d0 ! vector
      do i=1,n
-        q(i) = a_mod(i) * p(i)
-        ! do k = row_ptr(i), row_ptr(i+1)-1
-        !    j = col_idx(k)
-        !    q(i) = q(i) + a(k) * p(j)
-        ! end do
+!        q(i) = a_mod(i) * p(i)
+        do k = row_ptr(i), row_ptr(i+1)-1
+           j = col_idx(k)
+           q(i) = q(i) + a(k) * p(j)
+        end do
      end do
 
      alpha = roh / dot_product(p,q)     

@@ -37,7 +37,6 @@ program cg
         p = r + beta*p
      end if
 
-     q = 0d0 ! vector
      do i=1,n
         do k = row_ptr(i), row_ptr(i+1)-1
            j = col_idx(k)
