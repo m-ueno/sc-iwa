@@ -61,7 +61,7 @@ program pcg
 !        q(i) = a_mod(i) * p(i)
         do k = row_ptr(i), row_ptr(i+1)-1
            j = col_idx(k)
-           q(i) = q(i) + a(k) * p(j)
+           q(i) = q(i) + a_mod(k) * p(j)
         end do
      end do
 
