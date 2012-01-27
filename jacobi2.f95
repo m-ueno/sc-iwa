@@ -31,7 +31,7 @@ program jacobi2
               x(i) = x(i) - a(k)*xold(j)
            end if
         end do
-        
+
         x(i) = x(i) / diag(i)
 
      end do
@@ -60,7 +60,7 @@ program jacobi2
      xold = x
 
   end do ! iter
-  
+
   include "finalize.f95"
 
 end program jacobi2
